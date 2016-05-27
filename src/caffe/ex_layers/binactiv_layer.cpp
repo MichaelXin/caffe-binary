@@ -17,6 +17,12 @@ void BinActivLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   convolution_param.set_type("Convolution");
   convolution_param.mutable_convolution_param()->CopyFrom(
     this->layer_param_.convolution_param() );
+  convolution_param.mutable_convolution_param()->set_num_output(1);
+  convolution_param.mutable_convolution_param()->set_bias_term(false);
+  ::caffe::FillerParameter* conv_weif = convolution_param.mutable_convolution_param()->mutable_weight_filler();
+  conv_weif->set_type(std::string("constant"));
+  conv_weif->clear_value(); conv_weif->set_value(1);
+
   convolution_layer_ = LayerRegistry<Dtype>::CreateLayer(convolution_param);
   convolution_bottom_shared_.reset(new Blob<Dtype>());
   convolution_bottom_vec_.clear();
@@ -26,23 +32,19 @@ void BinActivLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   convolution_top_vec_.clear();
   convolution_top_vec_.push_back(convolution_top_shared_.get());
   convolution_layer_->SetUp(convolution_bottom_vec_, convolution_top_vec_);
+  
+  CHECK_EQ(convolution_layer_->blobs().size(), 1);
 }
 
 template <typename Dtype>
 void BinActivLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-  DLOG(INFO) << "-----> " << this->layer_param_.name() << ",,, enter Reshape";
   CHECK_EQ(top.size(), 2);
   CHECK_EQ(bottom.size(), 1);
   top[0]->ReshapeLike(*bottom[0]);
   convolution_bottom_vec_[0]->Reshape(bottom[0]->num(), 1, bottom[0]->height(), bottom[0]->width());
-  top[1]->Reshape(bottom[0]->num(), 1, bottom[0]->height(), bottom[0]->width());
   convolution_layer_->Reshape(convolution_bottom_vec_, convolution_top_vec_);
-  DLOG(INFO) << "-----> " << this->layer_param_.name() << ", bottom[0] shape : " << bottom[0]->num() << ", " << bottom[0]->channels() << ", " << bottom[0]->height() << ", " << bottom[0]->width();
-  DLOG(INFO) << "-----> " << this->layer_param_.name() << ", top[0] shape : " << top[0]->num() << ", " << top[0]->channels() << ", " << top[0]->height() << ", " << top[0]->width();
-  DLOG(INFO) << "-----> " << this->layer_param_.name() << ", top[1] shape : " << top[1]->num() << ", " << top[1]->channels() << ", " << top[1]->height() << ", " << top[1]->width();
-  DLOG(INFO) << "-----> " << this->layer_param_.name() << ", conv_bottom_vec[0] shape : " << convolution_bottom_vec_[0]->num() << ", " << convolution_bottom_vec_[0]->channels() << ", " << convolution_bottom_vec_[0]->height() << ", " << convolution_bottom_vec_[0]->width();
-  DLOG(INFO) << "-----> " << this->layer_param_.name() << ", conv_top_vec[0] shape : " << convolution_top_vec_[0]->num() << ", " << convolution_top_vec_[0]->channels() << ", " << convolution_top_vec_[0]->height() << ", " << convolution_top_vec_[0]->width();
+  top[1]->Reshape(convolution_top_vec_[0]->num(), 1, convolution_top_vec_[0]->height(), convolution_top_vec_[0]->width());
 }
 
 template <typename Dtype>

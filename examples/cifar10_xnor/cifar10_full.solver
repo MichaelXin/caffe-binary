@@ -11,18 +11,18 @@ test_iter: 100
 test_interval: 1000
 # The base learning rate, momentum and the weight decay of the network.
 gamma: 0.1
-base_lr: 0.01
+base_lr: 0.005
 momentum: 0.9
 weight_decay: 0.0001
 # The learning rate policy
-stepvalue: 25000
 stepvalue: 30000
-stepvalue: 35000
+stepvalue: 60000
+stepvalue: 90000
 lr_policy: "multistep"
 # Display every 200 iterations
 display: 200
 # The maximum number of iterations
-max_iter:  40000
+max_iter:  100000
 # snapshot intermediate results
 snapshot: 10000
 snapshot_prefix: "examples/cifar10_xnor/cifar10_xnor"

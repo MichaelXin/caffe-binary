@@ -1,3 +1,15 @@
+### results
+
+- **Train With Bias Term**
+- Test net output #0: accuracy = 0.825
+- Test net output #1: loss = 0.522995
+- **Train Without Bias Term**
+- Test net output #0: accuracy = 0.8133
+- Test net output #1: loss = 0.530016
+
+Only Iterate 40k times, More Iterations Will Increase Accuracy Higher Than 0.83
+====================================
+
 ---
 title: CIFAR-10 tutorial
 category: example
